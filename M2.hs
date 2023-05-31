@@ -10,7 +10,7 @@ type Board = (Player, [Piece], [Piece])
 setBoard::Board
 setBoard = (White, [
     R ('h',1), N ('g',1), B ('f',1), Q ('d',1), K ('e',1), B ('c',1), N ('b',1), R ('a',1),
-    P ('h',2), P ('g',2), P ('f',2), P ('e',2), P ('d',2), P ('c',2), P ('b',2), P ('a',2)],
+    P ('g',2), P ('g',3), P ('f',2), P ('e',2), P ('d',2), P ('c',2), P ('b',2), P ('a',2)],
     [R ('h',8), N ('g',8), B ('f',8), Q ('d',8), K ('e',8), B ('c',8), N ('b',8), R ('a',8),
     P ('h',7), P ('g',7), P ('f',7), P ('e',7), P ('d',7), P ('c',7), P ('b',7), P ('a',7)])
 
@@ -32,12 +32,12 @@ isValidMovePawn (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOl
         then
             isWithinBoard iOld iNew cOld cNew
             && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2) && (iOld == 2 || iOld == 7)) 
-            && (getDifference cNew cOld == 0) 
+            && ((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)))
             || (getDifference cNew cOld == 1) && ((not (isLocationEmpty blackPiecesLocations (cNew, iNew)) && ((isLocationEmpty whitePiecesLocations (cNew, iNew)))))
     else
         isWithinBoard iOld iNew cOld cNew
         && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2) && (iOld == 2 || iOld == 7)) 
-        && (getDifference cNew cOld == 0)
+        && ((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)))
         || (getDifference cNew cOld == 1) && (((isLocationEmpty blackPiecesLocations (cNew, iNew)) && (not(isLocationEmpty whitePiecesLocations (cNew, iNew)))))
 
 isValidMoveKnight :: Board -> Location -> Location -> Bool
