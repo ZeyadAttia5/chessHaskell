@@ -21,9 +21,9 @@ isLegal:: Piece -> Board -> Location -> Bool
 isLegal (P oldLoc) board loc = isValidMovePawn board oldLoc loc
 isLegal (N oldLoc) board loc = isValidMoveKnight board oldLoc loc
 isLegal (K oldLoc) board loc = isValidMoveKing board oldLoc loc
-isLegal (Q oldLoc) board loc = isValidMoveQueen board oldLoc loc
 isLegal (R oldLoc) board loc = isValidMoveRook board oldLoc loc
 isLegal (B oldLoc) board loc = isValidMoveBishop board oldLoc loc
+isLegal (Q oldLoc) board loc = isValidMoveQueen board oldLoc loc
 
 
 isValidMovePawn :: Board -> Location -> Location -> Bool
@@ -41,24 +41,58 @@ isValidMovePawn (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOl
         || (getDifference cNew cOld == 1) && (((isLocationEmpty blackPiecesLocations (cNew, iNew)) && (not(isLocationEmpty whitePiecesLocations (cNew, iNew)))))
 
 isValidMoveKnight :: Board -> Location -> Location -> Bool
-isValidMoveKnight board (cOld, iOld) (cNew, iNew) = 
-    isWithinBoard iOld iNew cOld cNew && (abs (iNew - iOld) == 2) 
-    && (((getDifference cNew cOld) == 1)  || (abs (getDifference cNew cOld) == 2 && abs (iNew - iOld) == 1))
+isValidMoveKnight (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cNew, iNew) = 
+    if player == White
+        then
+            isWithinBoard iOld iNew cOld cNew && (abs (iNew - iOld) == 2) 
+            && (((getDifference cNew cOld) == 1)  || (abs (getDifference cNew cOld) == 2 && abs (iNew - iOld) == 1))
+            && isLocationEmpty whitePiecesLocations (cNew, iNew)
+    else
+            isWithinBoard iOld iNew cOld cNew && (abs (iNew - iOld) == 2) 
+            && (((getDifference cNew cOld) == 1)  || (abs (getDifference cNew cOld) == 2 && abs (iNew - iOld) == 1))
+            && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
 isValidMoveKing :: Board -> Location -> Location -> Bool
-isValidMoveKing board (cOld,iOld) (cNew, iNew) =
-    isWithinBoard iOld iNew cOld cNew 
-    && (abs (iNew - iOld) == 1 &&  abs (getDifference cNew cOld) <= 1)
+isValidMoveKing (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld) (cNew, iNew) =
+    if player == White
+        then
+            isWithinBoard iOld iNew cOld cNew
+            && (abs (iNew - iOld) == 1 &&  abs (getDifference cNew cOld) <= 1)
+            && isLocationEmpty whitePiecesLocations (cNew,iNew)
+    else
+        isWithinBoard iOld iNew cOld cNew
+            && (abs (iNew - iOld) == 1 &&  abs (getDifference cNew cOld) <= 1)
+            && isLocationEmpty blackPiecesLocations (cNew,iNew)
 
-isValidMoveQueen :: Board -> Location -> Location -> Bool
-isValidMoveQueen board (cOld,iOld) (cNew, iNew) = 
-
+--same row or same column
 isValidMoveRook :: Board -> Location -> Location -> Bool
-isValidMoveRook board (cOld,iOld) (cNew, iNew) =
+isValidMoveRook (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld) (cNew, iNew) =
+    if player == White
+        then
+            isWithinBoard iOld iNew cOld cNew 
+            && (cNew == cOld && not(iNew == iOld)) || (not(cNew == cOld) && (iNew == iOld))
+            && isLocationEmpty whitePiecesLocations (cNew, iNew)
+    else
+            isWithinBoard iOld iNew cOld cNew 
+            && (cNew == cOld && not(iNew == iOld)) || (not(cNew == cOld) && (iNew == iOld))
+            && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
 isValidMoveBishop :: Board -> Location -> Location -> Bool
-isValidMoveBishop board (cOld,iOld) (cNew, iNew) =
+isValidMoveBishop (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld) (cNew, iNew) =
+    if player == White
+        then
+            isWithinBoard iOld iNew cOld cNew 
+            && abs (iNew - iOld) == abs(getDifference cNew cOld)
+            && isLocationEmpty whitePiecesLocations (cNew, iNew)
+    else
+            isWithinBoard iOld iNew cOld cNew 
+            && abs (iNew - iOld) == abs(getDifference cNew cOld)
+            && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
+
+isValidMoveQueen :: Board -> Location -> Location -> Bool
+isValidMoveQueen board oldLoc newLoc = 
+    isValidMoveBishop board oldLoc newLoc || isValidMoveRook board oldLoc newLoc
 
 
 
