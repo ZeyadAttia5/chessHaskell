@@ -38,7 +38,7 @@ isValidMovePawn (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOl
         isWithinBoard iOld iNew cOld cNew
         && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7)))  
         && (((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)) && (isLocationEmpty blackPiecesLocations (cNew, iNew)))
-        || (getDifference cNew cOld == 1) && (not(isLocationEmpty whitePiecesLocations (cNew, iNew)))
+        || (getDifference cNew cOld == 1) && (not(isLocationEmpty whitePiecesLocations (cNew, iNew))))
 
 isValidMoveKnight :: Board -> Location -> Location -> Bool
 isValidMoveKnight (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cNew, iNew) = 
