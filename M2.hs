@@ -136,9 +136,9 @@ isLocationTrue :: [Piece] -> Location -> Bool
 isLocationTrue [] loc = False
 isLocationTrue (piece : xs) loc =
   case piece of
-    P pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
-    N pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
-    K pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
-    Q pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
-    R pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
-    B pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
+    P pLoc -> if loc == pLoc then True else isLocationTrue xs loc
+    N pLoc -> if loc == pLoc then True else isLocationTrue xs loc
+    K pLoc -> if loc == pLoc then True else isLocationTrue xs loc
+    Q pLoc -> if loc == pLoc then True else isLocationTrue xs loc
+    R pLoc -> if loc == pLoc then True else isLocationTrue xs loc
+    B pLoc -> if loc == pLoc then True else isLocationTrue xs loc
