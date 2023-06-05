@@ -29,11 +29,15 @@ isValidMovePawn (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOl
     if player == White
         then
             isWithinBoard iOld iNew cOld cNew
+            && isLocationTrue whitePiecesLocations (cOld, iOld)
+            && (iNew > iOld)
             && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7)))
             && (((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)) && (isLocationEmpty blackPiecesLocations (cNew, iNew)))
-            || ((getDifference cNew cOld == 1) && ((not (isLocationEmpty blackPiecesLocations (cNew, iNew))))))
+                || ((getDifference cNew cOld == 1) && ((not (isLocationEmpty blackPiecesLocations (cNew, iNew))))))
     else
         isWithinBoard iOld iNew cOld cNew
+        && isLocationTrue blackPiecesLocations (cOld, iOld)
+        && (iNew < iOld)
         && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7)))  
         && (((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)) && (isLocationEmpty blackPiecesLocations (cNew, iNew)))
         || (getDifference cNew cOld == 1) && (not(isLocationEmpty whitePiecesLocations (cNew, iNew))))
@@ -46,23 +50,30 @@ isValidMoveKnight (player, whitePiecesLocations , blackPiecesLocations) (cOld, i
             && isLocationTrue whitePiecesLocations (cOld, iOld)
             && ((getDifference cNew cOld * abs(iNew-iOld)) == 2)
             && isLocationEmpty whitePiecesLocations (cNew, iNew)
-    else
+    else if player == Black
+        then
             isWithinBoard iOld iNew cOld cNew
             && isLocationTrue blackPiecesLocations(cOld, iOld)
             && ((getDifference cNew cOld * abs(iNew-iOld)) == 2)
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
+    else
+        False
 
 isValidMoveKing :: Board -> Location -> Location -> Bool
 isValidMoveKing (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld) (cNew, iNew) =
     if player == White
         then
             isWithinBoard iOld iNew cOld cNew
-            && (abs (iNew - iOld) == 1 &&  abs (getDifference cNew cOld) <= 1)
+            && (abs (iNew - iOld) <= 1 &&  abs (getDifference cNew cOld) <= 1)
             && isLocationEmpty whitePiecesLocations (cNew,iNew)
     else
-        isWithinBoard iOld iNew cOld cNew
-            && (abs (iNew - iOld) == 1 &&  abs (getDifference cNew cOld) <= 1)
-            && isLocationEmpty blackPiecesLocations (cNew,iNew)
+        if player == Black
+            then
+                isWithinBoard iOld iNew cOld cNew
+                && (abs (iNew - iOld) <= 1 &&  abs (getDifference cNew cOld) <= 1)
+                && isLocationEmpty blackPiecesLocations (cNew,iNew)
+    else
+        False
 
 --same row or same column
 isValidMoveRook :: Board -> Location -> Location -> Bool
@@ -122,7 +133,7 @@ isLocationEmpty (piece : xs) loc =
 
 -- check if location is in player's pieces
 isLocationTrue :: [Piece] -> Location -> Bool
-isLocationTrue [] _ = False
+isLocationTrue [] loc = False
 isLocationTrue (piece : xs) loc =
   case piece of
     P pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
