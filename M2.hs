@@ -1,4 +1,5 @@
 import Data.Char (ord)
+import Data.Char (chr)
 type Location = (Char, Int)
 data Player = White | Black deriving (Show, Eq)
 data Piece = P Location | N Location | K Location | Q Location | R Location | B Location deriving (Show, Eq)
@@ -31,14 +32,16 @@ isValidMovePawn (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOl
             isWithinBoard iOld iNew cOld cNew
             && isLocationTrue whitePiecesLocations (cOld, iOld)
             && (iNew > iOld)
-            && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7)))
+            && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7) 
+                            && areColCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cOld, iOld) (cNew, iNew) ))
             && (((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)) && (isLocationEmpty blackPiecesLocations (cNew, iNew)))
                 || ((getDifference cNew cOld == 1) && ((not (isLocationEmpty blackPiecesLocations (cNew, iNew))))))
     else
         isWithinBoard iOld iNew cOld cNew
         && isLocationTrue blackPiecesLocations (cOld, iOld)
         && (iNew < iOld)
-        && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7)))  
+         && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7) 
+                            && areColCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cOld, iOld) (cNew, iNew) ))
         && (((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)) && (isLocationEmpty blackPiecesLocations (cNew, iNew)))
         || (getDifference cNew cOld == 1) && (not(isLocationEmpty whitePiecesLocations (cNew, iNew))))
 
@@ -85,12 +88,16 @@ isValidMoveRook (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld
         then
             isWithinBoard iOld iNew cOld cNew 
             && isLocationTrue whitePiecesLocations (cOld, iOld)
-            && (cNew == cOld && not(iNew == iOld)) || (not(cNew == cOld) && (iNew == iOld))
+            && (cNew == cOld && not(iNew == iOld) && areColCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld) (cOld, iOld) (cNew, iNew))
+            || (not(cNew == cOld) && (iNew == iOld) && areRowCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cOld,iOld) (cNew, iNew))
+
             && isLocationEmpty whitePiecesLocations (cNew, iNew)
     else
             isWithinBoard iOld iNew cOld cNew 
             && isLocationTrue blackPiecesLocations (cOld, iOld)
-            && (cNew == cOld && not(iNew == iOld)) || (not(cNew == cOld) && (iNew == iOld))
+            && (cNew == cOld && not(iNew == iOld) && areColCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld) (cOld, iOld) (cNew, iNew)) 
+                    || (not(cNew == cOld) && (iNew == iOld) 
+                    && areRowCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cOld,iOld) (cNew, iNew) )
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
 isValidMoveBishop :: Board -> Location -> Location -> Bool
@@ -100,11 +107,13 @@ isValidMoveBishop (player, whitePiecesLocations , blackPiecesLocations) (cOld,iO
             isWithinBoard iOld iNew cOld cNew 
             && isLocationTrue whitePiecesLocations (cOld, iOld)
             && abs (iNew - iOld) == abs(getDifference cNew cOld)
+            && areDiagonalCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cOld, iOld) (cNew, iNew)
             && isLocationEmpty whitePiecesLocations (cNew, iNew)
     else
             isWithinBoard iOld iNew cOld cNew 
             && isLocationTrue blackPiecesLocations (cOld, iOld)
             && abs (iNew - iOld) == abs(getDifference cNew cOld)
+            && areDiagonalCellsEmpty (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cOld, iOld) (cNew, iNew)
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
 
@@ -149,3 +158,34 @@ isLocationTrue (piece : xs) loc =
     Q pLoc -> if loc == pLoc then True else isLocationTrue xs loc
     R pLoc -> if loc == pLoc then True else isLocationTrue xs loc
     B pLoc -> if loc == pLoc then True else isLocationTrue xs loc
+
+
+
+
+areColCellsEmpty :: Board -> Location -> Location -> Location -> Bool
+areColCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOld, iOld) (cOldStore, iOldStore) (cNew, iNew)
+  | cOld == cNew && iOld == iNew = True
+  | (cOldStore, iOldStore) /= (cOld, iOld) && (not (isLocationEmpty whitePiecesLocations (cOld, iOld)) || not (isLocationEmpty blackPiecesLocations (cOld, iOld))) = False
+  | cOld /= cNew = False
+  | iNew > iOld = areColCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOld, iOld + 1) (cOldStore, iOldStore) (cNew, iNew)
+  | iOld > iNew = areColCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOld, iOld - 1) (cOldStore, iOldStore) (cNew, iNew)
+  | otherwise = error "Invalid locations"
+  
+areRowCellsEmpty :: Board -> Location -> Location -> Location -> Bool
+areRowCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (cOld, iOld) (cNew, iNew)
+  | cOld == cNew && iOld == iNew = True
+  | (cOldStore, iOldStore) /= (cOld, iOld) && (not (isLocationEmpty whitePiecesLocations (cOld, iOld)) || not (isLocationEmpty blackPiecesLocations (cOld, iOld))) = False
+  | iOld /= iNew =False
+  | cNew > cOld = areRowCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (chr ((ord cOld) +1), iOld) (cNew, iNew)
+  | cOld > cNew = areRowCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (chr ((ord cOld) -1), iOld) (cNew, iNew)
+  | otherwise = error "Invalid locations"  
+  
+areDiagonalCellsEmpty :: Board -> Location -> Location -> Location -> Bool
+areDiagonalCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (cOld, iOld) (cNew, iNew)
+  | cOld == cNew && iOld == iNew = True
+  | (cOldStore, iOldStore) /= (cOld, iOld) && (not (isLocationEmpty whitePiecesLocations (cOld, iOld)) || not (isLocationEmpty blackPiecesLocations (cOld, iOld))) = False
+  | iNew > iOld && cNew > cOld = areDiagonalCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (chr ((ord cOld) +1), iOld + 1) (cNew, iNew)
+  | iNew > iOld && cNew < cOld = areDiagonalCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (chr ((ord cOld) -1), iOld + 1) (cNew, iNew)
+  | iNew < iOld && cNew > cOld = areDiagonalCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (chr ((ord cOld) +1), iOld - 1) (cNew, iNew)
+  | iNew < iOld && cNew < cOld = areDiagonalCellsEmpty (piece, whitePiecesLocations, blackPiecesLocations) (cOldStore, iOldStore) (chr ((ord cOld) -1), iOld - 1) (cNew, iNew)
+  | otherwise = error "Invalid locations" 
