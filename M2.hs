@@ -15,8 +15,6 @@ setBoard = (White, [
     P ('h',7), P ('g',7), P ('f',7), P ('e',7), P ('d',7), P ('c',7), P ('b',7), P ('a',7)])
 
 
-
-
 isLegal:: Piece -> Board -> Location -> Bool
 isLegal (P oldLoc) board loc = isValidMovePawn board oldLoc loc
 isLegal (N oldLoc) board loc = isValidMoveKnight board oldLoc loc
@@ -31,7 +29,7 @@ isValidMovePawn (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOl
     if player == White
         then
             isWithinBoard iOld iNew cOld cNew
-            && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7))) 
+            && ((abs (iNew - iOld) == 1) || ( abs (iNew - iOld) == 2 && (iOld == 2 || iOld == 7)))
             && (((getDifference cNew cOld == 0) && (isLocationEmpty whitePiecesLocations (cNew, iNew)) && (isLocationEmpty blackPiecesLocations (cNew, iNew)))
             || ((getDifference cNew cOld == 1) && ((not (isLocationEmpty blackPiecesLocations (cNew, iNew))))))
     else
@@ -44,12 +42,12 @@ isValidMoveKnight :: Board -> Location -> Location -> Bool
 isValidMoveKnight (player, whitePiecesLocations , blackPiecesLocations) (cOld, iOld) (cNew, iNew) = 
     if player == White
         then
-            isWithinBoard iOld iNew cOld cNew && (abs (iNew - iOld) == 2) 
-            && (((getDifference cNew cOld) == 1)  || (abs (getDifference cNew cOld) == 2 && abs (iNew - iOld) == 1))
+            isWithinBoard iOld iNew cOld cNew
+            && ((getDifference cNew cOld * abs(iNew-iOld)) == 2)
             && isLocationEmpty whitePiecesLocations (cNew, iNew)
     else
-            isWithinBoard iOld iNew cOld cNew && (abs (iNew - iOld) == 2) 
-            && (((getDifference cNew cOld) == 1)  || (abs (getDifference cNew cOld) == 2 && abs (iNew - iOld) == 1))
+            isWithinBoard iOld iNew cOld cNew
+            && ((getDifference cNew cOld * abs(iNew-iOld)) == 2)
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
 isValidMoveKing :: Board -> Location -> Location -> Bool
