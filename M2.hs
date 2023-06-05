@@ -43,10 +43,12 @@ isValidMoveKnight (player, whitePiecesLocations , blackPiecesLocations) (cOld, i
     if player == White
         then
             isWithinBoard iOld iNew cOld cNew
+            && isLocationTrue whitePiecesLocations (cOld, iOld)
             && ((getDifference cNew cOld * abs(iNew-iOld)) == 2)
             && isLocationEmpty whitePiecesLocations (cNew, iNew)
     else
             isWithinBoard iOld iNew cOld cNew
+            && isLocationTrue blackPiecesLocations(cOld, iOld)
             && ((getDifference cNew cOld * abs(iNew-iOld)) == 2)
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
@@ -117,3 +119,15 @@ isLocationEmpty (piece : xs) loc =
     Q pLoc -> if loc == pLoc then False else isLocationEmpty xs loc
     R pLoc -> if loc == pLoc then False else isLocationEmpty xs loc
     B pLoc -> if loc == pLoc then False else isLocationEmpty xs loc
+
+-- check if location is in player's pieces
+isLocationTrue :: [Piece] -> Location -> Bool
+isLocationTrue [] _ = False
+isLocationTrue (piece : xs) loc =
+  case piece of
+    P pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
+    N pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
+    K pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
+    Q pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
+    R pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
+    B pLoc -> if loc == pLoc then True else isLocationEmpty xs loc
