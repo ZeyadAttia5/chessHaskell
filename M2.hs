@@ -53,6 +53,7 @@ isValidMoveKnight (player, whitePiecesLocations , blackPiecesLocations) (cOld, i
     else if player == Black
         then
             isWithinBoard iOld iNew cOld cNew
+            && isLocationTrue blackPiecesLocations (cOld, iOld)
             && isLocationTrue blackPiecesLocations(cOld, iOld)
             && ((getDifference cNew cOld * abs(iNew-iOld)) == 2)
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
@@ -64,12 +65,14 @@ isValidMoveKing (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld
     if player == White
         then
             isWithinBoard iOld iNew cOld cNew
+            && isLocationTrue whitePiecesLocations (cOld, iOld)
             && (abs (iNew - iOld) <= 1 &&  abs (getDifference cNew cOld) <= 1)
             && isLocationEmpty whitePiecesLocations (cNew,iNew)
     else
         if player == Black
             then
                 isWithinBoard iOld iNew cOld cNew
+                && isLocationTrue blackPiecesLocations (cOld, iOld)
                 && (abs (iNew - iOld) <= 1 &&  abs (getDifference cNew cOld) <= 1)
                 && isLocationEmpty blackPiecesLocations (cNew,iNew)
     else
@@ -81,10 +84,12 @@ isValidMoveRook (player, whitePiecesLocations , blackPiecesLocations) (cOld,iOld
     if player == White
         then
             isWithinBoard iOld iNew cOld cNew 
+            && isLocationTrue whitePiecesLocations (cOld, iOld)
             && (cNew == cOld && not(iNew == iOld)) || (not(cNew == cOld) && (iNew == iOld))
             && isLocationEmpty whitePiecesLocations (cNew, iNew)
     else
             isWithinBoard iOld iNew cOld cNew 
+            && isLocationTrue blackPiecesLocations (cOld, iOld)
             && (cNew == cOld && not(iNew == iOld)) || (not(cNew == cOld) && (iNew == iOld))
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
@@ -93,10 +98,12 @@ isValidMoveBishop (player, whitePiecesLocations , blackPiecesLocations) (cOld,iO
     if player == White
         then
             isWithinBoard iOld iNew cOld cNew 
+            && isLocationTrue whitePiecesLocations (cOld, iOld)
             && abs (iNew - iOld) == abs(getDifference cNew cOld)
             && isLocationEmpty whitePiecesLocations (cNew, iNew)
     else
             isWithinBoard iOld iNew cOld cNew 
+            && isLocationTrue blackPiecesLocations (cOld, iOld)
             && abs (iNew - iOld) == abs(getDifference cNew cOld)
             && isLocationEmpty blackPiecesLocations (cNew, iNew)
 
